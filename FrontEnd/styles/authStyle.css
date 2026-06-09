@@ -1,0 +1,141 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.authMainContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    margin-top: 80px;
+    margin-bottom: 80px;
+    min-height: calc(100vh - 160px);
+    background-color: white;
+}
+
+.auth-card {
+    background-color: lightgray;
+    border: 3px solid lightslategray;
+    box-shadow: 0 5px lightslategray;
+    border-radius: 8px;
+    padding: 25px;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sign-up-card {
+    max-width: 600px;
+}
+
+.auth-title {
+    text-align: center;
+    color: black;
+    border-bottom: 2px solid white;
+    padding-bottom: 10px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+}
+
+.form-group label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-group input, 
+.form-group select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid gray;
+    font-size: 14px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 2px solid lightslategray;
+    background-color: white;
+    cursor: pointer;
+    box-shadow: 2px 2px gray;
+    transition: all 0.3s ease;
+}
+
+.auth-btn:hover {
+    background-color: lightskyblue;
+    border-color: lightblue;
+}
+
+.auth-links {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.auth-links a {
+    color: #0056b3;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+
+@media (min-width: 768px) {
+    .auth-card {
+        padding: 35px;
+    }
+    
+    
+    .form-row {
+        flex-direction: row;
+    }
+}
+
+
+@media (min-width: 1024px) {
+    .auth-title {
+        font-size: 28px;
+    }
+    
+    .form-group label {
+        font-size: 16px;
+    }
+    
+    .form-group input, 
+    .form-group select {
+        font-size: 16px;
+    }
+}

@@ -1,0 +1,41 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: white;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    z-index: 100;
+    height: 80px;
+    box-shadow: 0 -2px lightslategray;
+}
+
+.uop-footer-logo {
+    height: 50px;
+    width: auto;
+}
+
+.footerText {
+    font-size: 12px;
+    text-align: center;
+}
+
+
+@media (min-width: 768px) {
+    footer { padding: 15px 20px; }
+    .uop-footer-logo { height: 60px; }
+    .footerText { font-size: 14px; }
+}
+
+@media (min-width: 1024px) {
+    .uop-footer-logo { height: 80px; }
+    .footerText { font-size: 16px; }
+}

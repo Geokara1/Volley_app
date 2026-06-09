@@ -1,0 +1,176 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.addClubMainContainer {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    width: 100%;
+    margin-top: 80px;
+    margin-bottom: 80px;
+    min-height: calc(100vh - 160px);
+    background-color: white;
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 1000px;
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: black;
+}
+
+.add-club-form {
+    background-color: lightgray;
+    border: 3px solid lightslategray;
+    box-shadow: 0 5px lightslategray;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.form-section {
+    background-color: white;
+    border: 2px solid lightslategray;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-section h3 {
+    border-bottom: 2px solid lightgray;
+    padding-bottom: 5px;
+    color: black;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+}
+
+.form-group label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group input[type="file"] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid gray;
+    font-size: 14px;
+    width: 100%;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.roster-input-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.roster-input-table th, 
+.roster-input-table td {
+    border: 1px solid lightslategray;
+    padding: 8px;
+    text-align: center;
+}
+
+.roster-input-table th {
+    background-color: lightslategray;
+    color: white;
+    font-size: 14px;
+}
+
+.roster-input-table input,
+.roster-input-table select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid gray;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Buttons */
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.form-btn {
+    flex: 1;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 2px solid lightslategray;
+    background-color: white;
+    cursor: pointer;
+    box-shadow: 2px 2px gray;
+    transition: all 0.3s ease;
+}
+
+.form-btn:hover {
+    background-color: lightskyblue;
+    border-color: lightblue;
+}
+
+.submit-btn {
+    background-color: #a4dbf8;
+}
+
+
+@media (min-width: 768px) {
+    .add-club-form {
+        padding: 30px;
+    }
+    
+    .form-row {
+        flex-direction: row;
+    }
+
+    .form-actions {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+
+@media (min-width: 1024px) {
+    .form-title {
+        font-size: 28px;
+    }
+    
+    .form-section {
+        padding: 25px;
+    }
+    
+    .form-group label {
+        font-size: 16px;
+    }
+}
