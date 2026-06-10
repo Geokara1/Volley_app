@@ -1,5 +1,6 @@
-<?php
+<?php                                   
 session_start();
+require_once 'session_check.php';
 ?>
 <!DOCTYPE html>
 <html lang="el">

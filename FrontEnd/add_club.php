@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once 'session_check.php';
-requireRole('club_admin');   // ← μόνο για club_admin
+requireRole('club_admin');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,25 +9,37 @@ requireRole('club_admin');   // ← μόνο για club_admin
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Club</title>
-    <link rel="stylesheet" href="/styles/headerstyle.css">
-    <link rel="stylesheet" href="/styles/footerstyle.css">
-    <link rel="stylesheet" href="/styles/addClubStyle.css">
+    <link rel="stylesheet" href="styles/headerstyle.css">
+    <link rel="stylesheet" href="styles/footerstyle.css">
+    <link rel="stylesheet" href="styles/addClubStyle.css">
 </head>
 <body>
     <header>
         <div class="mainLogoContainer" id="mainLogoContainer">
-            <a href="index.html">
-                <img src="/media/mainpagelogo3.jpg" alt="page logo" class="main-page-logo" />
+            <a href="index.php">
+                <img src="media/mainpagelogo3.jpg" alt="page logo" class="main-page-logo" />
             </a>
         </div>
         <div class="navbar">
             <nav>
                 <ul>
-                    <li><a href="sign_up.html">Sign Up</a></li>
-                    <li><a href="login.html">Login</a></li>
-                    <li><a href="clubs.html">See Clubs</a></li>
-                    <li><a href="matches.html">Matches</a></li>
-                    <li><a href="table.html">Ranking</a></li>
+                    <li><a href="clubs.php">See Clubs</a></li>
+                    <li><a href="matches.php">Matches</a></li>
+                    <li><a href="table.php">Ranking</a></li>
+                    <?php if (!isLoggedIn()): ?>
+                        <li><a href="sign_up.php">Sign Up</a></li>
+                        <li><a href="login.php">Login</a></li>
+                    <?php else: ?>
+                        <?php if ($_SESSION['role'] === 'club_admin'): ?>
+                            <li><a href="add_club.php">Add Club</a></li>
+                        <?php elseif ($_SESSION['role'] === 'referee'): ?>
+                            <li><a href="add_result.php">Add Result</a></li>
+                        <?php elseif ($_SESSION['role'] === 'admin'): ?>
+                            <li><a href="admin_panel.php">Admin Panel</a></li>
+                        <?php endif; ?>
+                        <li><span>👤 <?= htmlspecialchars($_SESSION['first_name']) ?></span></li>
+                        <li><a href="logout.php">Logout</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
         </div>
@@ -36,8 +48,20 @@ requireRole('club_admin');   // ← μόνο για club_admin
     <main class="addClubMainContainer">
         <div class="form-wrapper">
             <h2 class="form-title">Register a New Club</h2>
-            <form class="add-club-form">
-                
+
+            <?php if (!empty($_SESSION['club_error'])): ?>
+                <div style="background:#fff3f3;border:1px solid #dc3545;border-radius:6px;padding:10px 14px;margin-bottom:16px;">
+                    <p style="color:#dc3545;margin:0;">✕ <?= htmlspecialchars($_SESSION['club_error']) ?></p>
+                </div>
+                <?php unset($_SESSION['club_error']); ?>
+            <?php endif; ?>
+
+            <!-- enctype ΑΠΑΡΑΙΤΗΤΟ για file uploads -->
+            <form class="add-club-form"
+                  action="add_club_handler.php"
+                  method="POST"
+                  enctype="multipart/form-data">
+
                 <!-- General Team Info -->
                 <div class="form-section">
                     <h3>General Information</h3>
@@ -62,7 +86,7 @@ requireRole('club_admin');   // ← μόνο για club_admin
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="teamVideo">Highlight Video (URL or File) *</label>
+                        <label for="teamVideo">Highlight Video URL *</label>
                         <input type="url" id="teamVideo" name="teamVideo" placeholder="https://youtube.com/..." required>
                     </div>
                 </div>
@@ -96,7 +120,7 @@ requireRole('club_admin');   // ← μόνο για club_admin
                     </div>
                 </div>
 
-                <!-- Players Roster (12 Players) -->
+                <!-- Players Roster (12 Players) — αναλλοίωτο -->
                 <div class="form-section">
                     <h3>Players Roster (Minimum 12 Players) *</h3>
                     <div class="table-responsive">
@@ -111,13 +135,12 @@ requireRole('club_admin');   // ← μόνο για club_admin
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Player 1 to 12 (Hardcoded to avoid JS) -->
-                                <!-- Player 1 -->
+                                <?php for ($i = 1; $i <= 12; $i++): ?>
                                 <tr>
-                                    <td><input type="number" name="p1_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p1_name" required></td>
+                                    <td><input type="number" name="p<?= $i ?>_num" min="0" max="99" required></td>
+                                    <td><input type="text" name="p<?= $i ?>_name" required></td>
                                     <td>
-                                        <select name="p1_pos" required>
+                                        <select name="p<?= $i ?>_pos" required>
                                             <option value="" disabled selected>Select</option>
                                             <option value="πασαδόρος">Πασαδόρος</option>
                                             <option value="λίμπερο">Λίμπερο</option>
@@ -126,196 +149,10 @@ requireRole('club_admin');   // ← μόνο για club_admin
                                             <option value="διαγώνιος">Διαγώνιος</option>
                                         </select>
                                     </td>
-                                    <td><input type="number" name="p1_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p1_dob" required></td>
+                                    <td><input type="number" name="p<?= $i ?>_height" step="0.01" min="0" required></td>
+                                    <td><input type="date" name="p<?= $i ?>_dob" required></td>
                                 </tr>
-                                <!-- Player 2 -->
-                                <tr>
-                                    <td><input type="number" name="p2_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p2_name" required></td>
-                                    <td>
-                                        <select name="p2_pos" required>
-                                            <option value="" disabled selected>Select</option>
-                                            <option value="πασαδόρος">Πασαδόρος</option>
-                                            <option value="λίμπερο">Λίμπερο</option>
-                                            <option value="ακραίος">Ακραίος</option>
-                                            <option value="κεντρικός">Κεντρικός</option>
-                                            <option value="διαγώνιος">Διαγώνιος</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" name="p2_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p2_dob" required></td>
-                                </tr>
-                                <!-- Player 3 -->
-                                <tr>
-                                    <td><input type="number" name="p3_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p3_name" required></td>
-                                    <td>
-                                        <select name="p3_pos" required>
-                                            <option value="" disabled selected>Select</option>
-                                            <option value="πασαδόρος">Πασαδόρος</option>
-                                            <option value="λίμπερο">Λίμπερο</option>
-                                            <option value="ακραίος">Ακραίος</option>
-                                            <option value="κεντρικός">Κεντρικός</option>
-                                            <option value="διαγώνιος">Διαγώνιος</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" name="p3_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p3_dob" required></td>
-                                </tr>
-                                <!-- Player 4 -->
-                                <tr>
-                                    <td><input type="number" name="p4_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p4_name" required></td>
-                                    <td>
-                                        <select name="p4_pos" required>
-                                            <option value="" disabled selected>Select</option>
-                                            <option value="πασαδόρος">Πασαδόρος</option>
-                                            <option value="λίμπερο">Λίμπερο</option>
-                                            <option value="ακραίος">Ακραίος</option>
-                                            <option value="κεντρικός">Κεντρικός</option>
-                                            <option value="διαγώνιος">Διαγώνιος</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" name="p4_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p4_dob" required></td>
-                                </tr>
-                                <!-- Player 5 -->
-                                <tr>
-                                    <td><input type="number" name="p5_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p5_name" required></td>
-                                    <td>
-                                        <select name="p5_pos" required>
-                                            <option value="" disabled selected>Select</option>
-                                            <option value="πασαδόρος">Πασαδόρος</option>
-                                            <option value="λίμπερο">Λίμπερο</option>
-                                            <option value="ακραίος">Ακραίος</option>
-                                            <option value="κεντρικός">Κεντρικός</option>
-                                            <option value="διαγώνιος">Διαγώνιος</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" name="p5_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p5_dob" required></td>
-                                </tr>
-                                <!-- Player 6 -->
-                                <tr>
-                                    <td><input type="number" name="p6_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p6_name" required></td>
-                                    <td>
-                                        <select name="p6_pos" required>
-                                            <option value="" disabled selected>Select</option>
-                                            <option value="πασαδόρος">Πασαδόρος</option>
-                                            <option value="λίμπερο">Λίμπερο</option>
-                                            <option value="ακραίος">Ακραίος</option>
-                                            <option value="κεντρικός">Κεντρικός</option>
-                                            <option value="διαγώνιος">Διαγώνιος</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" name="p6_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p6_dob" required></td>
-                                </tr>
-                                <!-- Player 7 -->
-                                <tr>
-                                    <td><input type="number" name="p7_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p7_name" required></td>
-                                    <td>
-                                        <select name="p7_pos" required>
-                                            <option value="" disabled selected>Select</option>
-                                            <option value="πασαδόρος">Πασαδόρος</option>
-                                            <option value="λίμπερο">Λίμπερο</option>
-                                            <option value="ακραίος">Ακραίος</option>
-                                            <option value="κεντρικός">Κεντρικός</option>
-                                            <option value="διαγώνιος">Διαγώνιος</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" name="p7_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p7_dob" required></td>
-                                </tr>
-                                <!-- Player 8 -->
-                                <tr>
-                                    <td><input type="number" name="p8_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p8_name" required></td>
-                                    <td>
-                                        <select name="p8_pos" required>
-                                            <option value="" disabled selected>Select</option>
-                                            <option value="πασαδόρος">Πασαδόρος</option>
-                                            <option value="λίμπερο">Λίμπερο</option>
-                                            <option value="ακραίος">Ακραίος</option>
-                                            <option value="κεντρικός">Κεντρικός</option>
-                                            <option value="διαγώνιος">Διαγώνιος</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" name="p8_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p8_dob" required></td>
-                                </tr>
-                                <!-- Player 9 -->
-                                <tr>
-                                    <td><input type="number" name="p9_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p9_name" required></td>
-                                    <td>
-                                        <select name="p9_pos" required>
-                                            <option value="" disabled selected>Select</option>
-                                            <option value="πασαδόρος">Πασαδόρος</option>
-                                            <option value="λίμπερο">Λίμπερο</option>
-                                            <option value="ακραίος">Ακραίος</option>
-                                            <option value="κεντρικός">Κεντρικός</option>
-                                            <option value="διαγώνιος">Διαγώνιος</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" name="p9_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p9_dob" required></td>
-                                </tr>
-                                <!-- Player 10 -->
-                                <tr>
-                                    <td><input type="number" name="p10_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p10_name" required></td>
-                                    <td>
-                                        <select name="p10_pos" required>
-                                            <option value="" disabled selected>Select</option>
-                                            <option value="πασαδόρος">Πασαδόρος</option>
-                                            <option value="λίμπερο">Λίμπερο</option>
-                                            <option value="ακραίος">Ακραίος</option>
-                                            <option value="κεντρικός">Κεντρικός</option>
-                                            <option value="διαγώνιος">Διαγώνιος</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" name="p10_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p10_dob" required></td>
-                                </tr>
-                                <!-- Player 11 -->
-                                <tr>
-                                    <td><input type="number" name="p11_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p11_name" required></td>
-                                    <td>
-                                        <select name="p11_pos" required>
-                                            <option value="" disabled selected>Select</option>
-                                            <option value="πασαδόρος">Πασαδόρος</option>
-                                            <option value="λίμπερο">Λίμπερο</option>
-                                            <option value="ακραίος">Ακραίος</option>
-                                            <option value="κεντρικός">Κεντρικός</option>
-                                            <option value="διαγώνιος">Διαγώνιος</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" name="p11_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p11_dob" required></td>
-                                </tr>
-                                <!-- Player 12 -->
-                                <tr>
-                                    <td><input type="number" name="p12_num" min="0" max="99" required></td>
-                                    <td><input type="text" name="p12_name" required></td>
-                                    <td>
-                                        <select name="p12_pos" required>
-                                            <option value="" disabled selected>Select</option>
-                                            <option value="πασαδόρος">Πασαδόρος</option>
-                                            <option value="λίμπερο">Λίμπερο</option>
-                                            <option value="ακραίος">Ακραίος</option>
-                                            <option value="κεντρικός">Κεντρικός</option>
-                                            <option value="διαγώνιος">Διαγώνιος</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" name="p12_height" step="0.01" min="0" required></td>
-                                    <td><input type="date" name="p12_dob" required></td>
-                                </tr>
+                                <?php endfor; ?>
                             </tbody>
                         </table>
                     </div>
@@ -331,7 +168,7 @@ requireRole('club_admin');   // ← μόνο για club_admin
 
     <footer>
         <div class="uopLogo" id="uopLogo">
-            <img src="/media/uop_new_logo.png" alt="university of peloponnese logo" class="uop-footer-logo" />
+            <img src="media/uop_new_logo.png" alt="university of peloponnese logo" class="uop-footer-logo" />
         </div>
         <div class="footerText" id="footerText">
             &#169; 2026 Ioannis Spanoudakis. All rights reserved.
