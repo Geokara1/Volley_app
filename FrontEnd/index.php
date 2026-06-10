@@ -1,9 +1,19 @@
+<?php
+// ── ΑΥΤΕΣ ΟΙ 2 ΓΡΑΜΜΕΣ ΜΠΑΙΝΟΥΝ ΣΤΗΝ ΑΡΧΗ ΚΑΘΕ .php ΑΡΧΕΙΟΥ ───────────────
+session_start();
+require_once 'session_check.php';
+// Για προστατευμένες σελίδες προσθέτεις και:
+// requireLogin();           → μόνο για logged in users
+// requireRole('club_admin') → μόνο για club admin
+// requireRole('referee')    → μόνο για referee
+// requireRole('admin')      → μόνο για admin
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
+    <title>VolleyballApp</title>
     <link rel="stylesheet" href="/styles/headerstyle.css">
     <link rel="stylesheet" href="/styles/footerstyle.css">
     <link rel="stylesheet" href="/styles/indexstyle.css">
@@ -11,41 +21,48 @@
 <body>
     <header>
         <div class="mainLogoContainer" id="mainLogoContainer">
-            <a href="index.html">
+            <a href="index.php">
                 <img src="/media/mainpagelogo3.jpg" alt="page logo" class="main-page-logo" />
             </a>
         </div>
+
         <div class="navbar">
             <nav>
                 <ul>
-                    <li><a href="sign_up.html">Sign Up</a></li>
-                    <li><a href="login.html">Login</a></li>
-                    <li><a href="clubs.html">See Clubs</a></li>
-                    <li><a href="matches.html">Matches</a></li>
-                    <li><a href="table.html">Ranking</a></li>
+                    <!-- ── ΣΤΑΘΕΡΑ LINKS (φαίνονται σε ΟΛΟΥΣ) ── -->
+                    <li><a href="clubs.php">See Clubs</a></li>
+                    <li><a href="matches.php">Matches</a></li>
+                    <li><a href="table.php">Ranking</a></li>
+
+                    <!-- ── ΔΥΝΑΜΙΚΑ LINKS (αλλάζουν ανά ρόλο) ── -->
+                    <?php if (!isLoggedIn()): ?>
+                        <!-- Visitor: δεν είναι logged in -->
+                        <li><a href="sign_up.php">Sign Up</a></li>
+                        <li><a href="login.php">Login</a></li>
+
+                    <?php else: ?>
+                        <!-- Logged in: εμφάνισε links ανάλογα με ρόλο -->
+                        <?php if ($_SESSION['role'] === 'club_admin'): ?>
+                            <li><a href="add_club.php">Add Club</a></li>
+
+                        <?php elseif ($_SESSION['role'] === 'referee'): ?>
+                            <li><a href="add_result.php">Add Result</a></li>
+
+                        <?php elseif ($_SESSION['role'] === 'admin'): ?>
+                            <li><a href="admin_panel.php">Admin Panel</a></li>
+                        <?php endif; ?>
+
+                        <!-- Όνομα χρήστη + Logout (για όλους τους logged in) -->
+                        <li><span style="color:#ccc;">👤 <?= htmlspecialchars($_SESSION['first_name']) ?></span></li>
+                        <li><a href="logout.php">Logout</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main class="mainContainer" id="mainContainer">
-        <div class="welcomeText" id="welcomeText">
-            Welcome to the Greek Volleyball League portal, where you can view everything
-            that is happening in the competitive volleyball scene.
-        </div>
-
-        <div class="pageInfo" id="pageInfo">
-            <h2>INFO</h2>
-            <p>
-                In the <strong>"See Clubs"</strong> tab you can see all the different teams.<br><br>
-                In the <strong>"Matches"</strong> tab you can see current, previous, and upcoming matches.<br><br>
-                In the <strong>"Ranking"</strong> tab you can see the current place of each team. 
-            </p>
-        </div>
-
-        <div class="mainPageImg" id="mainPageImg">
-            <img src="/media/aek_volley_men_mainpage.jpg" alt="Aek A 2 mens team" class ="main-page-img" />
-        </div>
+    <main>
+        <!-- Το περιεχόμενο της σελίδας εδώ -->
     </main>
 
     <footer>

@@ -2,7 +2,7 @@
 $host     = "localhost";
 $db_user  = "root";
 $db_pass  = "";           // στο XAMPP είναι κενό by default
-$db_name  = "volleyball_db";
+$db_name  = "volleyballclub";
 
 $conn = mysqli_connect($host, $db_user, $db_pass, $db_name);
 

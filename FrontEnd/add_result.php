@@ -1,3 +1,8 @@
+<?php
+session_start();
+require_once 'session_check.php';
+requireRole('referee');      // ← μόνο για referee
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

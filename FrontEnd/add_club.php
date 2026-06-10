@@ -1,3 +1,8 @@
+<?php
+session_start();
+require_once 'session_check.php';
+requireRole('club_admin');   // ← μόνο για club_admin
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
