@@ -243,7 +243,7 @@ $scheduleExists = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c
                     <li><a href="table.php">Ranking</a></li>
                     <li><a href="admin_panel.php"><strong>Admin Panel</strong></a></li>
                     <li><span>👤 <?= htmlspecialchars($_SESSION['first_name']) ?></span></li>
-                    <li><a href="logout.php">Logout</a></li>
+                    <li><a href="../BackEnd/logout.php">Logout</a></li>
                 </ul>
             </nav>
         </div>

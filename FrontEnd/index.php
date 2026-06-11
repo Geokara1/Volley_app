@@ -14,9 +14,9 @@ require_once '../BackEnd/session_check.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VolleyballApp</title>
-    <link rel="stylesheet" href="/styles/headerstyle.css">
-    <link rel="stylesheet" href="/styles/footerstyle.css">
-    <link rel="stylesheet" href="/styles/indexstyle.css">
+    <link rel="stylesheet" href="styles/headerstyle.css">
+    <link rel="stylesheet" href="styles/footerstyle.css">
+    <link rel="stylesheet" href="styles/indexstyle.css">
 </head>
 <body>
     <header>
@@ -54,7 +54,7 @@ require_once '../BackEnd/session_check.php';
 
                         <!-- Όνομα χρήστη + Logout (για όλους τους logged in) -->
                         <li><span style="color:#ccc;">👤 <?= htmlspecialchars($_SESSION['first_name']) ?></span></li>
-                        <li><a href="logout.php">Logout</a></li>
+                        <li><a href="../BackEnd/logout.php">Logout</a></li>
                     <?php endif; ?>
                 </ul>
             </nav>

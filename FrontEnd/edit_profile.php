@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
                     <li><a href="edit_profile.php"><strong>Edit Profile</strong></a></li>
                     <li><span>👤 <?= htmlspecialchars($_SESSION['first_name']) ?></span></li>
-                    <li><a href="logout.php">Logout</a></li>
+                    <li><a href="../BackEnd/logout.php">Logout</a></li>
                 </ul>
             </nav>
         </div>

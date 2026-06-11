@@ -45,7 +45,7 @@ $matchdaysResult = mysqli_query($conn, "SELECT * FROM matchday ORDER BY round_nu
                             <li><a href="admin_panel.php">Admin Panel</a></li>
                         <?php endif; ?>
                         <li><span>👤 <?= htmlspecialchars($_SESSION['first_name']) ?></span></li>
-                        <li><a href="logout.php">Logout</a></li>
+                        <li><a href="../BackEnd/logout.php">Logout</a></li>
                     <?php endif; ?>
                 </ul>
             </nav>
