@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '/BackEnd/session_check.php';
-require_once '/BackEnd/db.php';
+require_once '../BackEnd/session_check.php';
+require_once '../BackEnd/db.php';
 
 // ─── Υπολογισμός βαθμολογίας από valid αγώνες ────────────────────────────────
 // Βόλεϊ: 3-0 ή 3-1 → νικητής +3β, ηττημένος +0β

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '/BackEnd/session_check.php';
+require_once '../BackEnd/session_check.php';
 requireRole('club_admin');
 ?>
 <!DOCTYPE html>
@@ -58,7 +58,7 @@ requireRole('club_admin');
 
             <!-- enctype ΑΠΑΡΑΙΤΗΤΟ για file uploads -->
             <form class="add-club-form"
-                  action="/BackEnd/add_club_handler.php"
+                  action="../BackEnd/add_club_handler.php"
                   method="POST"
                   enctype="multipart/form-data">
 

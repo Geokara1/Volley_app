@@ -1,6 +1,6 @@
 <?php                                   
 session_start();
-require_once '/BackEnd/session_check.php';
+require_once '../BackEnd/session_check.php';
 ?>
 <!DOCTYPE html>
 <html lang="el">
@@ -61,7 +61,7 @@ require_once '/BackEnd/session_check.php';
             <?php endif; ?>
 
             <!-- action: στέλνει στο signup_handler.php | method POST: τα δεδομένα ΔΕΝ φαίνονται στο URL -->
-            <form class="auth-form" id="signupForm" action="/BackEnd/signup_handler.php" method="POST">
+            <form class="auth-form" id="signupForm" action="../BackEnd/signup_handler.php" method="POST">
 
                 <div class="form-row">
                     <div class="form-group">

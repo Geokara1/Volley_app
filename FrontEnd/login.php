@@ -60,7 +60,7 @@ if (!empty($_SESSION['logged_in'])) {
                 <?php unset($_SESSION['login_error']); ?>
             <?php endif; ?>
 
-            <form class="auth-form" id="loginForm" action="/BackEnd/login_handler.php" method="POST">
+            <form class="auth-form" id="loginForm" action="../BackEnd/login_handler.php" method="POST">
                 <div class="form-group">
                     <label for="username">Username:</label>
                     <input type="text" id="username" name="username" required>

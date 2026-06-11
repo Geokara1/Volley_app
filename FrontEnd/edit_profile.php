@@ -2,8 +2,8 @@
 // edit_profile.php
 // Προσβάσιμο από: club_admin και referee (όχι admin, όχι visitor)
 session_start();
-require_once '/BackEnd/session_check.php';
-require_once '/BackEnd/db.php';
+require_once '../BackEnd/session_check.php';
+require_once '../BackEnd/db.php';
 requireLogin();
 
 // Admin δεν χρειάζεται edit profile — έχει admin panel
