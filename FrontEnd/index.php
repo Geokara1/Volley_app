@@ -22,7 +22,7 @@ require_once '../BackEnd/session_check.php';
     <header>
         <div class="mainLogoContainer" id="mainLogoContainer">
             <a href="index.php">
-                <img src="/media/mainpagelogo3.jpg" alt="page logo" class="main-page-logo" />
+                <img src="media/mainpagelogo3.jpg" alt="page logo" class="main-page-logo" />
             </a>
         </div>
 
@@ -67,7 +67,7 @@ require_once '../BackEnd/session_check.php';
 
     <footer>
         <div class="uopLogo" id="uopLogo">
-            <img src="/media/uop_new_logo.png" alt="university of peloponnese logo" class="uop-footer-logo" />
+            <img src="media/uop_new_logo.png" alt="university of peloponnese logo" class="uop-footer-logo" />
         </div>
         <div class="footerText" id="footerText">
             &#169; 2026 Ioannis Spanoudakis. All rights reserved.
