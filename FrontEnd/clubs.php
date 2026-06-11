@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'session_check.php';
-require_once 'db.php';
+require_once '/BackEnd/session_check.php';
+require_once '/BackEnd/db.php';
 
 $teamsResult = mysqli_query($conn, "SELECT * FROM team_profile ORDER BY team_name");
 ?>

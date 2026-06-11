@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // AJAX call στο check_username.php
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/check_username.php', true);
+        xhr.open('POST', '/Volley_app/BackEnd/check_username.php', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {

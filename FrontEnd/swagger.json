@@ -1,0 +1,294 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "VolleyballApp REST API",
+    "description": "REST API για τη διαχείριση συλλόγων του πρωταθλήματος βόλεϊ.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Ioannis Spanoudakis"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost/Volley_app/FrontEnd/api.php",
+      "description": "Local XAMPP server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Clubs",
+      "description": "Διαχείριση συλλόγων βόλεϊ"
+    }
+  ],
+  "paths": {
+    "/clubs": {
+      "get": {
+        "tags": ["Clubs"],
+        "summary": "Επιστρέφει όλους τους συλλόγους",
+        "description": "Δημόσιο endpoint. Δεν απαιτεί authentication.",
+        "operationId": "getAllClubs",
+        "responses": {
+          "200": {
+            "description": "Λίστα συλλόγων",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "success" },
+                    "count":  { "type": "integer", "example": 10 },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/ClubSummary" }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "success",
+                  "count": 2,
+                  "data": [
+                    {
+                      "id": 1,
+                      "team_name": "ΑΕΚ",
+                      "team_site": "https://aek.gr",
+                      "team_logo": "uploads/logo_1.jpg",
+                      "coach_name": "Κ. Παπαδόπουλος"
+                    },
+                    {
+                      "id": 2,
+                      "team_name": "Παναθηναϊκός",
+                      "team_site": "https://pao.gr",
+                      "team_logo": "uploads/logo_2.jpg",
+                      "coach_name": "Γ. Νικολάου"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Clubs"],
+        "summary": "Δημιουργία νέου συλλόγου",
+        "description": "Απαιτεί authentication ως club_admin. Κάθε club_admin μπορεί να δημιουργήσει έναν μόνο σύλλογο.",
+        "operationId": "createClub",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ClubInput" },
+              "example": {
+                "team_name": "ΠΑΟΚ",
+                "team_site": "https://paok.gr",
+                "team_video": "https://youtube.com/watch?v=xxx",
+                "coach_name": "Α. Αλεξίου"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ο σύλλογος δημιουργήθηκε επιτυχώς",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "success",
+                  "message": "Ο σύλλογος δημιουργήθηκε.",
+                  "id": 3
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "409": {
+            "description": "Ο χρήστης έχει ήδη καταχωρήσει σύλλογο",
+            "content": {
+              "application/json": {
+                "example": { "status": "error", "message": "Έχεις ήδη καταχωρήσει σύλλογο." }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clubs/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID του συλλόγου",
+          "schema": { "type": "integer", "example": 1 }
+        }
+      ],
+      "get": {
+        "tags": ["Clubs"],
+        "summary": "Επιστρέφει έναν σύλλογο με τους παίκτες του",
+        "description": "Δημόσιο endpoint. Περιλαμβάνει τη λίστα παικτών.",
+        "operationId": "getClubById",
+        "responses": {
+          "200": {
+            "description": "Στοιχεία συλλόγου και παίκτες",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "success" },
+                    "data": { "$ref": "#/components/schemas/ClubDetail" }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["Clubs"],
+        "summary": "Επεξεργασία στοιχείων συλλόγου",
+        "description": "Απαιτεί authentication ως club_admin (μόνο του δικού του συλλόγου) ή admin.",
+        "operationId": "updateClub",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ClubInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Επιτυχής ενημέρωση",
+            "content": {
+              "application/json": {
+                "example": { "status": "success", "message": "Ο σύλλογος ενημερώθηκε." }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Clubs"],
+        "summary": "Διαγραφή συλλόγου",
+        "description": "Απαιτεί authentication. Διαγράφει τον σύλλογο και όλους τους παίκτες του.",
+        "operationId": "deleteClub",
+        "responses": {
+          "200": {
+            "description": "Επιτυχής διαγραφή",
+            "content": {
+              "application/json": {
+                "example": { "status": "success", "message": "Ο σύλλογος id=1 διαγράφηκε." }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ClubSummary": {
+        "type": "object",
+        "properties": {
+          "id":         { "type": "integer", "example": 1 },
+          "team_name":  { "type": "string",  "example": "ΑΕΚ" },
+          "team_site":  { "type": "string",  "example": "https://aek.gr" },
+          "team_logo":  { "type": "string",  "example": "uploads/logo_1.jpg" },
+          "team_video": { "type": "string",  "example": "https://youtube.com/..." },
+          "coach_name": { "type": "string",  "example": "Κ. Παπαδόπουλος" }
+        }
+      },
+      "ClubDetail": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ClubSummary" },
+          {
+            "type": "object",
+            "properties": {
+              "trainer_name":      { "type": "string" },
+              "physio_name":       { "type": "string" },
+              "caretaker_name":    { "type": "string" },
+              "statistician_name": { "type": "string" },
+              "players": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/Player" }
+              }
+            }
+          }
+        ]
+      },
+      "ClubInput": {
+        "type": "object",
+        "required": ["team_name", "coach_name"],
+        "properties": {
+          "team_name":  { "type": "string", "example": "ΠΑΟΚ" },
+          "team_site":  { "type": "string", "example": "https://paok.gr" },
+          "team_video": { "type": "string", "example": "https://youtube.com/..." },
+          "coach_name": { "type": "string", "example": "Α. Αλεξίου" }
+        }
+      },
+      "Player": {
+        "type": "object",
+        "properties": {
+          "id":             { "type": "integer", "example": 1 },
+          "jersey_number":  { "type": "integer", "example": 7 },
+          "full_name":      { "type": "string",  "example": "Νίκος Παπαδόπουλος" },
+          "position":       { "type": "string",  "example": "κεντρικός" },
+          "height":         { "type": "number",  "example": 2.01 },
+          "date_of_birth":  { "type": "string",  "example": "1998-05-14" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status":  { "type": "string", "example": "error" },
+          "message": { "type": "string", "example": "Περιγραφή σφάλματος" }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Λανθασμένα ή ελλιπή δεδομένα",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Απαιτείται σύνδεση",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+            "example": { "status": "error", "message": "Απαιτείται σύνδεση." }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Δεν έχετε δικαίωμα",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Ο σύλλογος δεν βρέθηκε",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+            "example": { "status": "error", "message": "Ο σύλλογος με id=99 δεν βρέθηκε." }
+          }
+        }
+      }
+    }
+  }
+}

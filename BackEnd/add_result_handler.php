@@ -6,7 +6,7 @@ require_once 'db.php';
 requireRole('referee');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: add_result.php');
+    header('Location: /Volley_app/FrontEnd/add_result.php');
     exit;
 }
 
@@ -15,7 +15,7 @@ $matchId = intval($_POST['match_id'] ?? 0);
 
 if ($matchId <= 0) {
     $_SESSION['result_error'] = 'Παρακαλώ επιλέξτε αγώνα.';
-    header('Location: add_result.php');
+    header('Location: /Volley_app/FrontEnd/add_result.php');
     exit;
 }
 
@@ -29,12 +29,12 @@ mysqli_stmt_close($checkStmt);
 
 if (!$match) {
     $_SESSION['result_error'] = 'Ο αγώνας δεν βρέθηκε.';
-    header('Location: add_result.php');
+    header('Location: /Volley_app/FrontEnd/add_result.php');
     exit;
 }
 if ($match['status'] !== 'unplayed') {
     $_SESSION['result_error'] = 'Αυτός ο αγώνας έχει ήδη καταχωρηθεί αποτέλεσμα.';
-    header('Location: add_result.php');
+    header('Location: /Volley_app/FrontEnd/add_result.php');
     exit;
 }
 
@@ -61,7 +61,7 @@ for ($i = 1; $i <= 5; $i++) {
 // ─── 4. VALIDATION: μία ομάδα πρέπει να έχει 3 σετ ─────────────────────────
 if ($homeSets !== 3 && $awaySets !== 3) {
     $_SESSION['result_error'] = 'Μη έγκυρο αποτέλεσμα. Μία ομάδα πρέπει να κερδίσει ακριβώς 3 σετ (3-0, 3-1 ή 3-2).';
-    header('Location: add_result.php?match_id=' . $matchId);
+    header('Location: /Volley_app/FrontEnd/add_result.php?match_id=' . $matchId);
     exit;
 }
 
@@ -77,7 +77,7 @@ if (isset($_FILES['matchSheet']) && $_FILES['matchSheet']['error'] === 0) {
     $ext = strtolower(pathinfo($_FILES['matchSheet']['name'], PATHINFO_EXTENSION));
     if ($ext !== 'pdf') {
         $_SESSION['result_error'] = 'Το φύλλο αγώνα πρέπει να είναι αρχείο PDF.';
-        header('Location: add_result.php?match_id=' . $matchId);
+        header('Location: /Volley_app/FrontEnd/add_result.php?match_id=' . $matchId);
         exit;
     }
 
@@ -112,12 +112,12 @@ if (mysqli_stmt_execute($updateStmt)) {
     $_SESSION['result_success'] = 'Το αποτέλεσμα (' . $homeSets . '-' . $awaySets . ') καταχωρήθηκε και αναμένει επικύρωση από τον διαχειριστή.';
     mysqli_stmt_close($updateStmt);
     mysqli_close($conn);
-    header('Location: matches.php');
+    header('Location: /Volley_app/FrontEnd/matches.php');
 } else {
     $_SESSION['result_error'] = 'Σφάλμα κατά την αποθήκευση. Προσπαθήστε ξανά.';
     mysqli_stmt_close($updateStmt);
     mysqli_close($conn);
-    header('Location: add_result.php?match_id=' . $matchId);
+    header('Location: /Volley_app/FrontEnd/add_result.php?match_id=' . $matchId);
 }
 exit;
 ?>

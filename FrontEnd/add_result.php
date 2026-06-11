@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'session_check.php';
-require_once 'db.php';
+require_once '/BackEnd/session_check.php';
+require_once '/BackEnd/db.php';
 requireRole('referee');
 
 // Φόρτωσε unplayed αγώνες για να επιλέξει ο διαιτητής
@@ -78,7 +78,7 @@ $matchesStmt = mysqli_query($conn, "
         <?php else: ?>
 
         <form class="match-form"
-              action="add_result_handler.php"
+              action="/BackEnd/add_result_handler.php"
               method="POST"
               enctype="multipart/form-data">
 

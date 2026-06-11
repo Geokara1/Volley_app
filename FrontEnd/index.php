@@ -1,7 +1,7 @@
 <?php
 // ── ΑΥΤΕΣ ΟΙ 2 ΓΡΑΜΜΕΣ ΜΠΑΙΝΟΥΝ ΣΤΗΝ ΑΡΧΗ ΚΑΘΕ .php ΑΡΧΕΙΟΥ ───────────────
 session_start();
-require_once 'session_check.php';
+require_once '/BackEnd/session_check.php';
 // Για προστατευμένες σελίδες προσθέτεις και:
 // requireLogin();           → μόνο για logged in users
 // requireRole('club_admin') → μόνο για club admin

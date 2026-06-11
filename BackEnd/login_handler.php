@@ -6,7 +6,7 @@ session_start();
 require_once 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: login.php');
+    header('Location: /Volley_app/FrontEnd/login.php');
     exit;
 }
 
@@ -16,7 +16,7 @@ $password = $_POST['password']      ?? '';
 
 if (empty($username) || empty($password)) {
     $_SESSION['login_error'] = 'Παρακαλώ συμπληρώστε όλα τα πεδία.';
-    header('Location: login.php');
+    header('Location: /Volley_app/FrontEnd/login.php');
     exit;
 }
 
@@ -35,7 +35,7 @@ mysqli_stmt_close($stmt);
 // Ίδιο μήνυμα για "δεν βρέθηκε" ΚΑΙ "λάθος password" — δεν αποκαλύπτουμε αν υπάρχει το username
 if (!$user) {
     $_SESSION['login_error'] = 'Λάθος username ή password.';
-    header('Location: login.php');
+    header('Location: /Volley_app/FrontEnd/login.php');
     exit;
 }
 
@@ -43,7 +43,7 @@ if (!$user) {
 // Ο χρήστης έχει εγγραφεί αλλά δεν έχει ενεργοποιηθεί ακόμα από τον admin
 if ($user['status'] === 'inactive') {
     $_SESSION['login_error'] = 'Ο λογαριασμός σας δεν έχει ενεργοποιηθεί ακόμα. Αναμένετε επικύρωση από τον διαχειριστή.';
-    header('Location: login.php');
+    header('Location: /Volley_app/FrontEnd/login.php');
     exit;
 }
 
@@ -51,7 +51,7 @@ if ($user['status'] === 'inactive') {
 // password_verify: συγκρίνει το plaintext με το hash της βάσης
 if (!password_verify($password, $user['password'])) {
     $_SESSION['login_error'] = 'Λάθος username ή password.';
-    header('Location: login.php');
+    header('Location: /Volley_app/FrontEnd/login.php');
     exit;
 }
 
@@ -68,12 +68,12 @@ mysqli_close($conn);
 // ─── 7. REDIRECT ΑΝΑΛΟΓΑ ΜΕ ΡΟΛΟ ─────────────────────────────────────────────
 switch ($user['role']) {
     case 'admin':
-        header('Location: admin_panel.php');
+        header('Location: /Volley_app/FrontEnd/admin_panel.php');
         break;
     case 'club_admin':
     case 'referee':
     default:
-        header('Location: index.php');
+        header('Location: /Volley_app/FrontEnd/index.php');
         break;
 }
 exit;

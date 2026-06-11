@@ -7,7 +7,7 @@ require_once 'db.php';
 
 // Αν κάποιος μπει απευθείας στο URL (GET), πήγαινέ τον πίσω
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: sign_up.php');
+    header('Location: /Volley_app/FrontEnd/sign_up.php');
     exit;
 }
 
@@ -53,7 +53,7 @@ if ($password !== $confirmPass) {
 // Αν υπάρχουν errors, πήγαινε πίσω στο sign_up με τα μηνύματα
 if (!empty($errors)) {
     $_SESSION['signup_errors'] = $errors;
-    header('Location: sign_up.php');
+    header('Location: /Volley_app/FrontEnd/sign_up.php');
     exit;
 }
 
@@ -67,7 +67,7 @@ mysqli_stmt_store_result($checkStmt);
 if (mysqli_stmt_num_rows($checkStmt) > 0) {
     $_SESSION['signup_errors'] = ['Το username χρησιμοποιείται ήδη.'];
     mysqli_stmt_close($checkStmt);
-    header('Location: sign_up.php');
+    header('Location: /Volley_app/FrontEnd/sign_up.php');
     exit;
 }
 mysqli_stmt_close($checkStmt);
@@ -96,14 +96,14 @@ if (mysqli_stmt_execute($insertStmt)) {
     $_SESSION['signup_success'] = 'Η εγγραφή ολοκληρώθηκε! Αναμένετε ενεργοποίηση από τον διαχειριστή.';
     mysqli_stmt_close($insertStmt);
     mysqli_close($conn);
-    header('Location: login.php');
+    header('Location: /Volley_app/FrontEnd/login.php');
     exit;
 } else {
     // ΑΠΟΤΥΧΙΑ
     $_SESSION['signup_errors'] = ['Σφάλμα κατά την εγγραφή. Προσπαθήστε ξανά.'];
     mysqli_stmt_close($insertStmt);
     mysqli_close($conn);
-    header('Location: sign_up.php');
+    header('Location: /Volley_app/FrontEnd/sign_up.php');
     exit;
 }
 ?>

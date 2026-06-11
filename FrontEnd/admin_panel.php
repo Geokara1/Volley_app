@@ -1,8 +1,8 @@
 <?php
 // admin_panel.php
 session_start();
-require_once 'session_check.php';
-require_once 'db.php';
+require_once '/BackEnd/session_check.php';
+require_once '/BackEnd/db.php';
 requireRole('admin');
 
 // ─── ROUND-ROBIN ALGORITHM ───────────────────────────────────────────────────
