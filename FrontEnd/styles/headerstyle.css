@@ -21,16 +21,16 @@ header {
 .main-page-logo {
     height: 60px;
     width: auto;
+    flex-shrink: 0;
 }
 
 .navbar {
     display: flex;
     align-items: center;
-    overflow-x: auto; 
+    overflow-x: auto;
     white-space: nowrap;
     padding-bottom: 5px;
 }
-
 
 .navbar::-webkit-scrollbar { display: none; }
 
@@ -59,6 +59,55 @@ header {
     box-shadow: 2px 2px gray;
 }
 
+/* ── Πολύ μικρές οθόνες (κινητό) ─────────────────── */
+@media (max-width: 480px) {
+    header {
+        height: auto;
+        min-height: 60px;
+        padding: 8px 10px;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .main-page-logo {
+        height: 40px;
+    }
+
+    .navbar {
+        width: 100%;
+        padding-bottom: 4px;
+    }
+
+    .navbar ul {
+        gap: 6px;
+    }
+
+    .navbar a {
+        font-size: 11px;
+        padding: 5px 7px;
+        border-radius: 6px;
+        box-shadow: 1px 1px white;
+    }
+
+    /* Margin για main content — header μεγαλώνει σε 2 γραμμές */
+    body {
+        padding-top: 110px;
+    }
+}
+
+/* ── Μεσαίες οθόνες (tablet) ─────────────────────── */
+@media (min-width: 481px) and (max-width: 767px) {
+    .navbar a {
+        font-size: 12px;
+        padding: 6px 9px;
+    }
+
+    .navbar ul {
+        gap: 8px;
+    }
+}
+
+/* ── Desktop ──────────────────────────────────────── */
 @media (min-width: 768px) {
     .main-page-logo { height: 70px; }
     .navbar a { font-size: 16px; padding: 10px 15px; }
