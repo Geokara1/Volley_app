@@ -1,45 +1,40 @@
 <?php
-// admin_panel.php
+
 session_start();
-require_once '../BackEnd/session_check.php';
-require_once '../BackEnd/db.php';
+require_once 'session_check.php';
+require_once 'db.php';
 requireRole('admin');
 
-// ─── ROUND-ROBIN ALGORITHM ───────────────────────────────────────────────────
 function generateRoundRobin(array $teamIds): array {
-    $n       = count($teamIds); // 10
+    $n       = count($teamIds); 
     $fixed   = $teamIds[0];
-    $rotating = array_slice($teamIds, 1); // υπόλοιπες 9
+    $rotating = array_slice($teamIds, 1); 
 
     $firstLeg = [];
     for ($round = 0; $round < $n - 1; $round++) {
         $matches   = [];
-        $matches[] = [$fixed, $rotating[0]]; // σταθερή vs πρώτη της rotation
+        $matches[] = [$fixed, $rotating[0]]; 
         for ($i = 1; $i < $n / 2; $i++) {
             $matches[] = [$rotating[$i], $rotating[$n - 1 - $i]];
         }
         $firstLeg[] = $matches;
-        // Rotation: τελευταία ομάδα μπαίνει πρώτη
         array_unshift($rotating, array_pop($rotating));
     }
 
-    // 2ος γύρος: αντίστροφα home/away
     $secondLeg = [];
     foreach ($firstLeg as $round) {
         $secondLeg[] = array_map(fn($m) => [$m[1], $m[0]], $round);
     }
 
-    return array_merge($firstLeg, $secondLeg); // 18 αγωνιστικές
+    return array_merge($firstLeg, $secondLeg); 
 }
 
-// ─── HANDLE POST ACTIONS ─────────────────────────────────────────────────────
 $flashMsg  = '';
 $flashType = 'success';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
-    // 1. Ενεργοποίηση χρήστη
     if ($action === 'activate_user') {
         $uid  = intval($_POST['user_id'] ?? 0);
         $stmt = mysqli_prepare($conn, "UPDATE users SET status='active' WHERE id=? AND role!='admin'");
@@ -49,17 +44,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $flashMsg = 'Ο χρήστης ενεργοποιήθηκε επιτυχώς.';
     }
 
-    // 2. Απενεργοποίηση χρήστη
     elseif ($action === 'deactivate_user') {
         $uid  = intval($_POST['user_id'] ?? 0);
-        $stmt = mysqli_prepare($conn, "UPDATE users SET status='inactive' WHERE id=? AND role!='admin'");
+        $stmt = mysqli_prepare($conn, "UPDATE users SET status='pending' WHERE id=? AND role!='admin'");
         mysqli_stmt_bind_param($stmt, "i", $uid);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
         $flashMsg = 'Ο χρήστης απενεργοποιήθηκε.';
     }
 
-    // 3. Επικύρωση αγώνα
     elseif ($action === 'validate_match') {
         $mid  = intval($_POST['match_id'] ?? 0);
         $stmt = mysqli_prepare($conn, "UPDATE match_result SET status='valid' WHERE id=? AND status='pending'");
@@ -69,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $flashMsg = 'Το αποτέλεσμα επικυρώθηκε.';
     }
 
-    // 4. Δημιουργία κλήρωσης
     elseif ($action === 'generate_schedule') {
         $teamsResult = mysqli_query($conn, "SELECT id FROM team_profile ORDER BY id");
         $teamIds     = [];
@@ -77,11 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $teamIds[] = $t['id'];
         }
 
-        if (count($teamIds) !== 10) {
-            $flashMsg  = 'Χρειάζονται ακριβώς 10 σύλλογοι. Αυτή τη στιγμή υπάρχουν ' . count($teamIds) . '.';
+        if (count($teamIds) < 2 || count($teamIds) % 2 !== 0) {
+            $flashMsg  = 'Χρειάζονται τουλάχιστον 2 σύλλογοι σε άρτιο αριθμό. Αυτή τη στιγμή υπάρχουν ' . count($teamIds) . '.';
             $flashType = 'error';
         } else {
-            // Διαγραφή παλιού προγράμματος
+    
             mysqli_query($conn, "DELETE FROM match_result");
             mysqli_query($conn, "DELETE FROM matchday");
 
@@ -90,14 +82,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($schedule as $roundIdx => $roundMatches) {
                 $roundNo = $roundIdx + 1;
 
-                // INSERT αγωνιστική
                 $mdStmt = mysqli_prepare($conn, "INSERT INTO matchday (round_number) VALUES (?)");
                 mysqli_stmt_bind_param($mdStmt, "i", $roundNo);
                 mysqli_stmt_execute($mdStmt);
                 $matchdayId = mysqli_insert_id($conn);
                 mysqli_stmt_close($mdStmt);
 
-                // INSERT αγώνες
                 $mStmt = mysqli_prepare($conn,
                     "INSERT INTO match_result (matchday_id, home_team_id, away_team_id, status)
                      VALUES (?, ?, ?, 'unplayed')"
@@ -112,7 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // PRG pattern: redirect για να αποφύγουμε double submit
     $redirectTab = $_POST['redirect_tab'] ?? 'users';
     header('Location: admin_panel.php?tab=' . $redirectTab
         . '&msg=' . urlencode($flashMsg)
@@ -120,16 +109,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Flash message από redirect
 if (!empty($_GET['msg'])) {
     $flashMsg  = $_GET['msg'];
     $flashType = $_GET['type'] ?? 'success';
 }
 
-// ─── ACTIVE TAB ───────────────────────────────────────────────────────────────
 $tab = $_GET['tab'] ?? 'users';
 
-// ─── FETCH USERS ──────────────────────────────────────────────────────────────
 $roleFilter   = $_GET['role']   ?? 'all';
 $statusFilter = $_GET['status'] ?? 'all';
 
@@ -145,7 +131,6 @@ $usersResult = mysqli_query($conn,
      ORDER BY u.status ASC, u.role ASC, u.last_name ASC"
 );
 
-// ─── FETCH MATCHES ────────────────────────────────────────────────────────────
 $matchStatusFilter = $_GET['match_status'] ?? 'all';
 
 $matchWhere = ($matchStatusFilter !== 'all')
@@ -165,7 +150,6 @@ $matchesResult = mysqli_query($conn,
      ORDER BY md.round_number, mr.id"
 );
 
-// ─── SCHEDULE INFO ────────────────────────────────────────────────────────────
 $teamCount      = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM team_profile"))['c'];
 $scheduleExists = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM matchday"))['c'] > 0;
 ?>
@@ -181,7 +165,6 @@ $scheduleExists = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c
         body { font-family: sans-serif; margin: 0; }
         .admin-main { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
 
-        /* Tabs */
         .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 2px solid #ddd; }
         .tab-btn {
             padding: 10px 24px; background: #f5f5f5; border: none;
@@ -190,39 +173,34 @@ $scheduleExists = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c
         }
         .tab-btn.active { background: #1D9E75; color: #fff; font-weight: 500; }
 
-        /* Flash message */
         .flash-success { background:#f0fff4; border:1px solid #28a745; border-radius:6px; padding:10px 16px; margin-bottom:20px; color:#28a745; }
         .flash-error   { background:#fff3f3; border:1px solid #dc3545; border-radius:6px; padding:10px 16px; margin-bottom:20px; color:#dc3545; }
 
-        /* Filters */
         .filters { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
         .filters a { padding:6px 14px; border-radius:20px; background:#f0f0f0; font-size:13px; text-decoration:none; color:#555; }
         .filters a.active { background:#1D9E75; color:#fff; }
 
-        /* Table */
         table { width:100%; border-collapse:collapse; font-size:13px; }
         th { background:#f5f5f5; padding:10px 12px; text-align:left; font-weight:500; border-bottom:2px solid #e0e0e0; }
         td { padding:9px 12px; border-bottom:1px solid #eee; vertical-align:middle; }
         tr:hover td { background:#fafafa; }
 
-        /* Badges */
+ 
         .badge { display:inline-block; padding:2px 10px; border-radius:10px; font-size:12px; }
         .badge-active   { background:#E1F5EE; color:#085041; }
-        .badge-inactive { background:#FFF3CD; color:#856404; }
+        .badge-pending { background:#FFF3CD; color:#856404; }
         .badge-valid    { background:#E1F5EE; color:#085041; }
         .badge-pending  { background:#FFF3CD; color:#856404; }
         .badge-unplayed { background:#e9ecef; color:#495057; }
         .badge-admin    { background:#E6F1FB; color:#185FA5; }
         .badge-referee  { background:#F0E6FB; color:#6B2FA0; }
 
-        /* Buttons */
         .btn { padding:5px 14px; border:none; border-radius:5px; cursor:pointer; font-size:13px; }
         .btn-activate   { background:#1D9E75; color:#fff; }
         .btn-deactivate { background:#dc3545; color:#fff; }
         .btn-validate   { background:#378ADD; color:#fff; }
         .btn-generate   { background:#BA7517; color:#fff; padding:10px 24px; font-size:14px; }
 
-        /* Schedule info box */
         .info-box { border:1px solid #ddd; border-radius:8px; padding:20px; margin-bottom:20px; }
         .info-box h3 { margin-top:0; }
         .warning { background:#FFF3CD; border:1px solid #ffc107; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-size:13px; }
@@ -243,7 +221,7 @@ $scheduleExists = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c
                     <li><a href="table.php">Ranking</a></li>
                     <li><a href="admin_panel.php"><strong>Admin Panel</strong></a></li>
                     <li><span>👤 <?= htmlspecialchars($_SESSION['first_name']) ?></span></li>
-                    <li><a href="../BackEnd/logout.php">Logout</a></li>
+                    <li><a href="logout.php">Logout</a></li>
                 </ul>
             </nav>
         </div>
@@ -252,24 +230,20 @@ $scheduleExists = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c
     <main class="admin-main">
         <h2 style="margin-bottom:20px;">Admin Panel</h2>
 
-        <!-- Flash message -->
         <?php if ($flashMsg): ?>
             <div class="flash-<?= $flashType === 'error' ? 'error' : 'success' ?>">
                 <?= htmlspecialchars($flashMsg) ?>
             </div>
         <?php endif; ?>
 
-        <!-- Tabs -->
         <div class="tabs">
             <a href="admin_panel.php?tab=users"    class="tab-btn <?= $tab==='users'    ? 'active' : '' ?>">👥 Χρήστες</a>
             <a href="admin_panel.php?tab=matches"  class="tab-btn <?= $tab==='matches'  ? 'active' : '' ?>">⚽ Αγώνες</a>
             <a href="admin_panel.php?tab=schedule" class="tab-btn <?= $tab==='schedule' ? 'active' : '' ?>">📅 Κλήρωση</a>
         </div>
 
-        <!-- ══ TAB 1: USERS ══════════════════════════════════════════════════ -->
         <?php if ($tab === 'users'): ?>
 
-            <!-- Φίλτρα -->
             <div class="filters">
                 <strong style="line-height:2;">Ρόλος:</strong>
                 <a href="?tab=users&role=all&status=<?= $statusFilter ?>"    class="<?= $roleFilter==='all'        ? 'active' : '' ?>">Όλοι</a>
@@ -278,7 +252,7 @@ $scheduleExists = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c
                 &nbsp;
                 <strong style="line-height:2;">Status:</strong>
                 <a href="?tab=users&role=<?= $roleFilter ?>&status=all"      class="<?= $statusFilter==='all'      ? 'active' : '' ?>">Όλα</a>
-                <a href="?tab=users&role=<?= $roleFilter ?>&status=inactive" class="<?= $statusFilter==='inactive' ? 'active' : '' ?>">Inactive</a>
+                <a href="?tab=users&role=<?= $roleFilter ?>&status=pending" class="<?= $statusFilter==='pending' ? 'active' : '' ?>">Pending</a>
                 <a href="?tab=users&role=<?= $roleFilter ?>&status=active"   class="<?= $statusFilter==='active'   ? 'active' : '' ?>">Active</a>
             </div>
 
@@ -315,7 +289,7 @@ $scheduleExists = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c
                             </span>
                         </td>
                         <td>
-                            <?php if ($u['status'] === 'inactive'): ?>
+                            <?php if ($u['status'] === 'pending'): ?>
                                 <form method="POST">
                                     <input type="hidden" name="action" value="activate_user">
                                     <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
@@ -337,10 +311,9 @@ $scheduleExists = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c
             </table>
             <?php endif; ?>
 
-        <!-- ══ TAB 2: MATCHES ════════════════════════════════════════════════ -->
+
         <?php elseif ($tab === 'matches'): ?>
 
-            <!-- Φίλτρα status -->
             <div class="filters">
                 <strong style="line-height:2;">Status:</strong>
                 <a href="?tab=matches&match_status=all"      class="<?= $matchStatusFilter==='all'      ? 'active' : '' ?>">Όλοι</a>
@@ -397,7 +370,6 @@ $scheduleExists = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c
             </table>
             <?php endif; ?>
 
-        <!-- ══ TAB 3: SCHEDULE ═══════════════════════════════════════════════ -->
         <?php elseif ($tab === 'schedule'): ?>
 
             <div class="info-box">
@@ -405,15 +377,15 @@ $scheduleExists = (int)mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c
 
                 <p>
                     Καταχωρημένοι σύλλογοι:
-                    <strong style="color:<?= $teamCount===10 ? '#1D9E75' : '#dc3545' ?>;">
-                        <?= $teamCount ?> / 10
+                    <strong style="color:<?= ($teamCount >= 2 && $teamCount % 2 === 0) ? '#1D9E75' : '#dc3545' ?>;">
+                        <?= $teamCount ?> (άρτιος αριθμός απαιτείται)
                     </strong>
                 </p>
 
-                <?php if ($teamCount !== 10): ?>
+                <?php if ($teamCount < 2 || $teamCount % 2 !== 0): ?>
                     <div class="warning">
-                        ⚠️ Χρειάζονται ακριβώς <strong>10 σύλλογοι</strong> για να γίνει κλήρωση.
-                        <?= $teamCount < 10 ? 'Λείπουν ' . (10-$teamCount) . ' ακόμα.' : 'Υπάρχουν παραπάνω από 10.' ?>
+                        ⚠️ Απαιτείται <strong>άρτιος αριθμός συλλόγων</strong> (τουλάχιστον 2) για να γίνει κλήρωση.
+                        <?= 'Τρέχων αριθμός: ' . $teamCount . ($teamCount % 2 !== 0 ? ' (μονός αριθμός — προσθέστε άλλον έναν)' : '') ?>
                     </div>
                 <?php else: ?>
                     <?php if ($scheduleExists): ?>

@@ -59,7 +59,6 @@ header {
     box-shadow: 2px 2px gray;
 }
 
-/* ── Πολύ μικρές οθόνες (κινητό) ─────────────────── */
 @media (max-width: 480px) {
     header {
         height: auto;
@@ -89,13 +88,11 @@ header {
         box-shadow: 1px 1px white;
     }
 
-    /* Margin για main content — header μεγαλώνει σε 2 γραμμές */
     body {
         padding-top: 110px;
     }
 }
 
-/* ── Μεσαίες οθόνες (tablet) ─────────────────────── */
 @media (min-width: 481px) and (max-width: 767px) {
     .navbar a {
         font-size: 12px;
@@ -107,7 +104,6 @@ header {
     }
 }
 
-/* ── Desktop ──────────────────────────────────────── */
 @media (min-width: 768px) {
     .main-page-logo { height: 70px; }
     .navbar a { font-size: 16px; padding: 10px 15px; }

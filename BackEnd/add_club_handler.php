@@ -1,8 +1,8 @@
 <?php
-// BackEnd/add_club_handler.php
+
 session_start();
-require_once 'db.php';           // ίδιος φάκελος (BackEnd/)
-require_once 'session_check.php'; // ίδιος φάκελος (BackEnd/)
+require_once 'db.php';           
+require_once 'session_check.php'; 
 requireRole('club_admin');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// ─── 1. ΕΛΕΓΧΟΣ: ο club_admin έχει ήδη σύλλογο; ────────────────────────────
+
 $adminId = $_SESSION['user_id'];
 
 $checkStmt = mysqli_prepare($conn, "SELECT id FROM team_profile WHERE admin_id = ?");
@@ -26,7 +26,7 @@ if (mysqli_stmt_num_rows($checkStmt) > 0) {
 }
 mysqli_stmt_close($checkStmt);
 
-// ─── 2. SANITIZE CLUB INFO ───────────────────────────────────────────────────
+
 $teamName         = trim($_POST['teamName']         ?? '');
 $teamSite         = trim($_POST['teamSite']         ?? '');
 $teamVideo        = trim($_POST['teamVideo']         ?? '');
@@ -42,8 +42,7 @@ if (empty($teamName) || empty($coachName)) {
     exit;
 }
 
-// ─── 3. FILE UPLOADS ─────────────────────────────────────────────────────────
-// Αποθηκεύονται στο BackEnd/uploads/ (ίδιος φάκελος με τον handler)
+
 $uploadDir    = __DIR__ . '/uploads/';
 $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 $logoPath     = '';
@@ -53,7 +52,7 @@ if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0755, true);
 }
 
-// Upload logo
+
 if (isset($_FILES['teamLogo']) && $_FILES['teamLogo']['error'] === 0) {
     if (!in_array($_FILES['teamLogo']['type'], $allowedTypes)) {
         $_SESSION['club_error'] = 'Μόνο εικόνες επιτρέπονται για το λογότυπο (jpg, png, gif).';
@@ -63,10 +62,10 @@ if (isset($_FILES['teamLogo']) && $_FILES['teamLogo']['error'] === 0) {
     $ext      = pathinfo($_FILES['teamLogo']['name'], PATHINFO_EXTENSION);
     $filename = 'logo_' . $adminId . '_' . time() . '.' . $ext;
     move_uploaded_file($_FILES['teamLogo']['tmp_name'], $uploadDir . $filename);
-    $logoPath = 'uploads/' . $filename; // αποθηκεύεται έτσι στη DB
+    $logoPath = 'uploads/' . $filename; 
 }
 
-// Upload photo
+
 if (isset($_FILES['teamPhoto']) && $_FILES['teamPhoto']['error'] === 0) {
     if (!in_array($_FILES['teamPhoto']['type'], $allowedTypes)) {
         $_SESSION['club_error'] = 'Μόνο εικόνες επιτρέπονται για τη φωτογραφία (jpg, png, gif).';
@@ -79,7 +78,6 @@ if (isset($_FILES['teamPhoto']) && $_FILES['teamPhoto']['error'] === 0) {
     $photoPath = 'uploads/' . $filename;
 }
 
-// ─── 4. INSERT team_profile ──────────────────────────────────────────────────
 $insertClub = mysqli_prepare($conn,
     "INSERT INTO team_profile
         (team_name, team_site, team_logo, team_photo, team_video,
@@ -102,7 +100,7 @@ if (!mysqli_stmt_execute($insertClub)) {
 $teamId = mysqli_insert_id($conn);
 mysqli_stmt_close($insertClub);
 
-// ─── 5. INSERT 12 PLAYERS ────────────────────────────────────────────────────
+
 $insertPlayer = mysqli_prepare($conn,
     "INSERT INTO player (team_id, jersey_number, full_name, position, height, date_of_birth)
      VALUES (?, ?, ?, ?, ?, ?)"
@@ -125,7 +123,6 @@ for ($i = 1; $i <= 12; $i++) {
 mysqli_stmt_close($insertPlayer);
 mysqli_close($conn);
 
-// ─── 6. ΕΠΙΤΥΧΙΑ ─────────────────────────────────────────────────────────────
 $_SESSION['club_success'] = 'Ο σύλλογος "' . htmlspecialchars($teamName) . '" καταχωρήθηκε επιτυχώς!';
 header('Location: /Volley_app/FrontEnd/clubs.php');
 exit;

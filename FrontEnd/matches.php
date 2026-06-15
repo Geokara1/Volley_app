@@ -68,7 +68,6 @@ $matchdaysResult = mysqli_query($conn, "SELECT * FROM matchday ORDER BY round_nu
 
                 <div class="series">
                     <?php
-                    // Αγώνες αυτής της αγωνιστικής με ονόματα ομάδων
                     $mStmt = mysqli_prepare($conn, "
                         SELECT mr.*,
                                ht.team_name AS home_name, ht.team_logo AS home_logo,
@@ -95,7 +94,7 @@ $matchdaysResult = mysqli_query($conn, "SELECT * FROM matchday ORDER BY round_nu
                                     <li>—</li>
                                 <?php endif; ?>
 
-                                <!-- Home team -->
+                               
                                 <li>
                                     <?php if (!empty($match['home_logo'])): ?>
                                         <img src="<?= htmlspecialchars($match['home_logo']) ?>"
@@ -108,7 +107,7 @@ $matchdaysResult = mysqli_query($conn, "SELECT * FROM matchday ORDER BY round_nu
 
                                 <li>VS</li>
 
-                                <!-- Away team -->
+                                
                                 <li>
                                     <?php if (!empty($match['away_logo'])): ?>
                                         <img src="<?= htmlspecialchars($match['away_logo']) ?>"
@@ -119,7 +118,7 @@ $matchdaysResult = mysqli_query($conn, "SELECT * FROM matchday ORDER BY round_nu
                                     <?php endif; ?>
                                 </li>
 
-                                <!-- Status / Score -->
+                                
                                 <li>
                                     <?php if ($match['status'] === 'valid'): ?>
                                         <span class="badge-valid">

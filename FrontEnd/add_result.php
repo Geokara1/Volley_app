@@ -4,7 +4,6 @@ require_once '../BackEnd/session_check.php';
 require_once '../BackEnd/db.php';
 requireRole('referee');
 
-// Φόρτωσε unplayed αγώνες για να επιλέξει ο διαιτητής
 $matchId = isset($_GET['match_id']) ? intval($_GET['match_id']) : 0;
 
 $matchesStmt = mysqli_query($conn, "
@@ -82,7 +81,6 @@ $matchesStmt = mysqli_query($conn, "
               method="POST"
               enctype="multipart/form-data">
 
-            <!-- Επιλογή αγώνα -->
             <div class="form-group" style="margin-bottom:20px;">
                 <label for="match_id"><strong>Επιλογή Αγώνα *</strong></label>
                 <select name="match_id" id="match_id" required style="width:100%;padding:8px;margin-top:6px;">
@@ -98,7 +96,6 @@ $matchesStmt = mysqli_query($conn, "
                 </select>
             </div>
 
-            <!-- Σκορ ανά σετ -->
             <div class="sets-container">
                 <?php for ($s = 1; $s <= 5; $s++): ?>
                 <div class="set" id="set<?= $s ?>">
@@ -113,7 +110,6 @@ $matchesStmt = mysqli_query($conn, "
                 <?php endfor; ?>
             </div>
 
-            <!-- Upload φύλλου αγώνα -->
             <div class="file-upload">
                 <label for="matchSheet"><strong>Upload Match Sheet (PDF):</strong></label>
                 <input type="file" id="matchSheet" name="matchSheet" accept=".pdf">

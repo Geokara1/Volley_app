@@ -57,7 +57,6 @@ $teamsResult = mysqli_query($conn, "SELECT * FROM team_profile ORDER BY team_nam
         <?php else: ?>
             <?php while ($team = mysqli_fetch_assoc($teamsResult)): ?>
                 <?php
-                // Παίκτες για αυτή την ομάδα
                 $pStmt = mysqli_prepare($conn, "SELECT * FROM player WHERE team_id = ? ORDER BY jersey_number");
                 mysqli_stmt_bind_param($pStmt, "i", $team['id']);
                 mysqli_stmt_execute($pStmt);

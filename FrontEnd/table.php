@@ -3,9 +3,6 @@ session_start();
 require_once '../BackEnd/session_check.php';
 require_once '../BackEnd/db.php';
 
-// ─── Υπολογισμός βαθμολογίας από valid αγώνες ────────────────────────────────
-// Βόλεϊ: 3-0 ή 3-1 → νικητής +3β, ηττημένος +0β
-//        3-2         → νικητής +2β, ηττημένος +1β
 
 $standings = [];
 
@@ -25,7 +22,6 @@ while ($m = mysqli_fetch_assoc($result)) {
     $hs  = (int)$m['home_sets'];
     $as  = (int)$m['away_sets'];
 
-    // Αρχικοποίηση αν δεν υπάρχουν ακόμα
     foreach ([$hid => $m['home_name'], $aid => $m['away_name']] as $tid => $tname) {
         if (!isset($standings[$tid])) {
             $logo = ($tid === $hid) ? $m['home_logo'] : $m['away_logo'];
@@ -50,13 +46,13 @@ while ($m = mysqli_fetch_assoc($result)) {
     $standings[$aid]['sets_lost'] += $hs;
 
     if ($hs > $as) {
-        // Home νικά
+        
         $standings[$hid]['wins']++;
         $standings[$aid]['losses']++;
         $standings[$hid]['points'] += ($as === 2) ? 2 : 3;
         $standings[$aid]['points'] += ($as === 2) ? 1 : 0;
     } else {
-        // Away νικά
+        
         $standings[$aid]['wins']++;
         $standings[$hid]['losses']++;
         $standings[$aid]['points'] += ($hs === 2) ? 2 : 3;
@@ -64,7 +60,7 @@ while ($m = mysqli_fetch_assoc($result)) {
     }
 }
 
-// Ταξινόμηση: βαθμοί ↓, ratio sets ↓
+
 usort($standings, function ($a, $b) {
     if ($b['points'] !== $a['points']) return $b['points'] - $a['points'];
     $ratioA = $a['sets_lost'] > 0 ? $a['sets_won'] / $a['sets_lost'] : $a['sets_won'];
@@ -116,7 +112,7 @@ usort($standings, function ($a, $b) {
 
     <main class="mainRankingContainer" id="mainRankingContainer">
 
-        <!-- Header row -->
+
         <div class="rankItem" id="rankItemTitles">
             <ul>
                 <li>No</li>

@@ -1,6 +1,5 @@
 <?php
 session_start();
-// Αν είναι ήδη logged in, πήγαινέ τον στην αρχική
 if (!empty($_SESSION['logged_in'])) {
     header('Location: index.php');
     exit;
@@ -40,7 +39,6 @@ if (!empty($_SESSION['logged_in'])) {
         <div class="auth-card">
             <h2 class="auth-title">Login to Your Account</h2>
 
-            <!-- Μήνυμα επιτυχίας από εγγραφή (signup_handler → login.php) -->
             <?php if (!empty($_SESSION['signup_success'])): ?>
                 <div style="background:#f0fff4;border:1px solid #28a745;border-radius:6px;padding:10px 14px;margin-bottom:16px;">
                     <p style="color:#28a745;margin:0;font-size:13px;">
@@ -50,7 +48,6 @@ if (!empty($_SESSION['logged_in'])) {
                 <?php unset($_SESSION['signup_success']); ?>
             <?php endif; ?>
 
-            <!-- Μήνυμα λάθους από login (login_handler → login.php) -->
             <?php if (!empty($_SESSION['login_error'])): ?>
                 <div style="background:#fff3f3;border:1px solid #dc3545;border-radius:6px;padding:10px 14px;margin-bottom:16px;">
                     <p style="color:#dc3545;margin:0;font-size:13px;">

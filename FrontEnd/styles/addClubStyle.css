@@ -114,7 +114,6 @@
     box-sizing: border-box;
 }
 
-/* Buttons */
 .form-actions {
     display: flex;
     flex-direction: column;

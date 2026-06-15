@@ -12,7 +12,6 @@ require_once '../BackEnd/session_check.php';
     <link rel="stylesheet" href="styles/footerstyle.css">
     <link rel="stylesheet" href="styles/authStyle.css">
     <style>
-        /* Error message styles — μπορείς να τα μεταφέρεις στο authStyle.css */
         .error-msg {
             color: #dc3545;
             font-size: 12px;
@@ -48,7 +47,6 @@ require_once '../BackEnd/session_check.php';
         <div class="auth-card sign-up-card">
             <h2 class="auth-title">Create an Account</h2>
 
-            <!-- Server-side errors (από signup_handler.php) -->
             <?php if (!empty($_SESSION['signup_errors'])): ?>
                 <div class="server-errors" style="background:#fff3f3;border:1px solid #dc3545;border-radius:6px;padding:10px 14px;margin-bottom:16px;">
                     <?php foreach ($_SESSION['signup_errors'] as $err): ?>
@@ -60,7 +58,6 @@ require_once '../BackEnd/session_check.php';
                 <?php unset($_SESSION['signup_errors']); ?>
             <?php endif; ?>
 
-            <!-- action: στέλνει στο signup_handler.php | method POST: τα δεδομένα ΔΕΝ φαίνονται στο URL -->
             <form class="auth-form" id="signupForm" action="../BackEnd/signup_handler.php" method="POST">
 
                 <div class="form-row">
@@ -79,7 +76,6 @@ require_once '../BackEnd/session_check.php';
                 <div class="form-row">
                     <div class="form-group">
                         <label for="role">Role:</label>
-                        <!-- ΣΗΜΑΝΤΙΚΟ: μόνο club_admin και referee — visitors είναι οι μη-εγγεγραμμένοι -->
                         <select id="role" name="role" required>
                             <option value="" disabled selected>Select your role</option>
                             <option value="club_admin">Διαχειριστής Συλλόγου</option>
@@ -140,7 +136,6 @@ require_once '../BackEnd/session_check.php';
         </div>
     </footer>
 
-    <!-- Το validation script φορτώνει ΜΕΤΑ το HTML ώστε να βρει τα elements -->
     <script src="/scripts/signup_validation.js"></script>
 </body>
 </html>

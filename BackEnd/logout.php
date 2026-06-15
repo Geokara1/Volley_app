@@ -1,10 +1,7 @@
 <?php
-// logout.php
-// Καταστρέφει το session και επιστρέφει στην αρχική
-
 session_start();
-session_unset();    // αδειάζει όλες τις session μεταβλητές
-session_destroy();  // διαγράφει το session από τον server
+session_unset();    
+session_destroy(); 
 
 header('Location: /Volley_app/FrontEnd/index.php');
 exit;

@@ -1,28 +1,18 @@
 <?php
-// api.php — REST API για τους συλλόγους
-// Endpoints:
-//   GET    api.php/clubs      → όλοι οι σύλλογοι
-//   GET    api.php/clubs/{id} → ένας σύλλογος + παίκτες
-//   POST   api.php/clubs      → προσθήκη νέου συλλόγου
-//   PUT    api.php/clubs/{id} → επεξεργασία συλλόγου
-//   DELETE api.php/clubs/{id} → διαγραφή συλλόγου
 
 session_start();
 require_once 'db.php';
 
-// Κάθε απάντηση είναι JSON
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// OPTIONS request (preflight για CORS)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
 function respond($data, int $code = 200): void {
     http_response_code($code);
     echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
@@ -42,8 +32,6 @@ function requireAuth(string $role = ''): void {
     }
 }
 
-// ─── PARSE URL ────────────────────────────────────────────────────────────────
-// api.php/clubs/3  →  PATH_INFO = /clubs/3
 $pathInfo = $_SERVER['PATH_INFO'] ?? '/';
 $segments = explode('/', trim($pathInfo, '/'));
 
@@ -52,17 +40,15 @@ $id       = (isset($segments[1]) && is_numeric($segments[1]))
             ? intval($segments[1])
             : null;
 
-// Μόνο το 'clubs' resource υποστηρίζεται
+
 if ($resource !== 'clubs') {
     respondError('Resource not found. Χρησιμοποίησε /api.php/clubs', 404);
 }
 
-// ─── ROUTING ──────────────────────────────────────────────────────────────────
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
 
-    // ── GET ───────────────────────────────────────────────────────────────────
     case 'GET':
         if ($id !== null) {
             getClub($id);
@@ -71,20 +57,17 @@ switch ($method) {
         }
         break;
 
-    // ── POST ──────────────────────────────────────────────────────────────────
     case 'POST':
         requireAuth('club_admin');
         createClub();
         break;
 
-    // ── PUT ───────────────────────────────────────────────────────────────────
     case 'PUT':
         requireAuth('club_admin');
         if ($id === null) respondError('Απαιτείται ID. π.χ. api.php/clubs/3', 400);
         updateClub($id);
         break;
 
-    // ── DELETE ────────────────────────────────────────────────────────────────
     case 'DELETE':
         requireAuth('club_admin');
         if ($id === null) respondError('Απαιτείται ID. π.χ. api.php/clubs/3', 400);
@@ -95,7 +78,7 @@ switch ($method) {
         respondError('Method not allowed', 405);
 }
 
-// ─── GET ALL CLUBS ─────────────────────────────────────────────────────────
+
 function getAllClubs(): void {
     global $conn;
 
@@ -117,11 +100,9 @@ function getAllClubs(): void {
     ]);
 }
 
-// ─── GET CLUB BY ID ───────────────────────────────────────────────────────────
 function getClub(int $id): void {
     global $conn;
 
-    // Fetch club
     $stmt = mysqli_prepare($conn, "SELECT * FROM team_profile WHERE id = ?");
     mysqli_stmt_bind_param($stmt, "i", $id);
     mysqli_stmt_execute($stmt);
@@ -132,7 +113,6 @@ function getClub(int $id): void {
         respondError("Ο σύλλογος με id=$id δεν βρέθηκε.", 404);
     }
 
-    // Fetch players
     $pStmt = mysqli_prepare($conn,
         "SELECT id, jersey_number, full_name, position, height, date_of_birth
          FROM player WHERE team_id = ? ORDER BY jersey_number"
@@ -152,11 +132,10 @@ function getClub(int $id): void {
     respond(['status' => 'success', 'data' => $club]);
 }
 
-// ─── CREATE CLUB (POST) ───────────────────────────────────────────────────────
 function createClub(): void {
     global $conn;
 
-    // Διάβασε JSON body
+
     $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
     $teamName  = trim($input['team_name']  ?? '');
@@ -169,7 +148,6 @@ function createClub(): void {
         respondError('Τα πεδία team_name και coach_name είναι υποχρεωτικά.', 400);
     }
 
-    // Έλεγχος: έχει ήδη σύλλογο αυτός ο admin;
     $checkStmt = mysqli_prepare($conn, "SELECT id FROM team_profile WHERE admin_id = ?");
     mysqli_stmt_bind_param($checkStmt, "i", $adminId);
     mysqli_stmt_execute($checkStmt);
@@ -201,11 +179,10 @@ function createClub(): void {
     }
 }
 
-// ─── UPDATE CLUB (PUT) ────────────────────────────────────────────────────────
 function updateClub(int $id): void {
     global $conn;
 
-    // Έλεγχος: υπάρχει ο σύλλογος;
+    
     $checkStmt = mysqli_prepare($conn, "SELECT admin_id FROM team_profile WHERE id = ?");
     mysqli_stmt_bind_param($checkStmt, "i", $id);
     mysqli_stmt_execute($checkStmt);
@@ -216,7 +193,6 @@ function updateClub(int $id): void {
         respondError("Ο σύλλογος με id=$id δεν βρέθηκε.", 404);
     }
 
-    // Μόνο ο club_admin του συλλόγου ή admin μπορεί να επεξεργαστεί
     if ($_SESSION['role'] === 'club_admin' && $club['admin_id'] != $_SESSION['user_id']) {
         respondError('Δεν έχεις δικαίωμα να επεξεργαστείς αυτόν τον σύλλογο.', 403);
     }
@@ -249,7 +225,6 @@ function updateClub(int $id): void {
     }
 }
 
-// ─── DELETE CLUB (DELETE) ─────────────────────────────────────────────────────
 function deleteClub(int $id): void {
     global $conn;
 
@@ -267,13 +242,10 @@ function deleteClub(int $id): void {
         respondError('Δεν έχεις δικαίωμα να διαγράψεις αυτόν τον σύλλογο.', 403);
     }
 
-    // Διαγραφή παικτών πρώτα (foreign key)
     $delPlayers = mysqli_prepare($conn, "DELETE FROM player WHERE team_id = ?");
     mysqli_stmt_bind_param($delPlayers, "i", $id);
     mysqli_stmt_execute($delPlayers);
     mysqli_stmt_close($delPlayers);
-
-    // Διαγραφή συλλόγου
     $stmt = mysqli_prepare($conn, "DELETE FROM team_profile WHERE id = ?");
     mysqli_stmt_bind_param($stmt, "i", $id);
 

@@ -1,12 +1,10 @@
 <?php
-// edit_profile.php
-// Προσβάσιμο από: club_admin και referee (όχι admin, όχι visitor)
+
 session_start();
 require_once '../BackEnd/session_check.php';
 require_once '../BackEnd/db.php';
 requireLogin();
 
-// Admin δεν χρειάζεται edit profile — έχει admin panel
 if ($_SESSION['role'] === 'admin') {
     header('Location: admin_panel.php');
     exit;
@@ -16,14 +14,12 @@ $userId  = $_SESSION['user_id'];
 $success = '';
 $errors  = [];
 
-// ─── Φόρτωσε τρέχοντα στοιχεία χρήστη ──────────────────────────────────────
 $stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE id = ?");
 mysqli_stmt_bind_param($stmt, "i", $userId);
 mysqli_stmt_execute($stmt);
 $user = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 mysqli_stmt_close($stmt);
 
-// ─── HANDLE POST ─────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $firstName = trim($_POST['firstName'] ?? '');
@@ -33,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newPass   = $_POST['newPassword']    ?? '';
     $confPass  = $_POST['confirmPassword'] ?? '';
 
-    // ── Validation ────────────────────────────────────────────────────────────
     if (empty($firstName) || preg_match('/\d/', $firstName)) {
         $errors[] = 'Μη έγκυρο όνομα.';
     }
@@ -46,8 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = 'Μη έγκυρη διεύθυνση email.';
     }
-
-    // Password: μόνο αν συμπληρώθηκε
     $updatePassword = false;
     if (!empty($newPass)) {
         if (strlen($newPass) < 5 || !preg_match('/[!@#$%^&*()\-_=+\[\]{};:\'",.<>?\/\\|`~]/', $newPass)) {
@@ -59,11 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // ── Αν δεν υπάρχουν errors → UPDATE ──────────────────────────────────────
     if (empty($errors)) {
 
         if ($updatePassword) {
-            // UPDATE με νέο password
             $hashedPass = password_hash($newPass, PASSWORD_DEFAULT);
             $upStmt = mysqli_prepare($conn, "
                 UPDATE users
@@ -74,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $firstName, $lastName, $phone, $email, $hashedPass, $userId
             );
         } else {
-            // UPDATE χωρίς αλλαγή password
             $upStmt = mysqli_prepare($conn, "
                 UPDATE users
                 SET first_name = ?, last_name = ?, phone = ?, email = ?
@@ -86,10 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (mysqli_stmt_execute($upStmt)) {
-            // Ανανέωσε το session ώστε το navbar να δείξει το νέο όνομα
             $_SESSION['first_name'] = $firstName;
 
-            // Ανανέωσε το $user για να φαίνεται στη φόρμα
             $user['first_name'] = $firstName;
             $user['last_name']  = $lastName;
             $user['phone']      = $phone;
@@ -160,14 +148,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="auth-card" style="max-width:520px;">
             <h2 class="auth-title">Edit Profile</h2>
 
-            <!-- Success message -->
             <?php if ($success): ?>
                 <div style="background:#f0fff4;border:1px solid #28a745;border-radius:6px;padding:10px 14px;margin-bottom:16px;">
                     <p style="color:#28a745;margin:0;">✓ <?= htmlspecialchars($success) ?></p>
                 </div>
             <?php endif; ?>
 
-            <!-- Error messages -->
             <?php if (!empty($errors)): ?>
                 <div style="background:#fff3f3;border:1px solid #dc3545;border-radius:6px;padding:10px 14px;margin-bottom:16px;">
                     <?php foreach ($errors as $err): ?>
@@ -178,7 +164,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form class="auth-form" method="POST" action="edit_profile.php">
 
-                <!-- Read-only: username και role -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>Username (μη επεξεργάσιμο)</label>
@@ -194,7 +179,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
 
-                <!-- Editable fields -->
                 <div class="form-row">
                     <div class="form-group">
                         <label for="firstName">Όνομα *</label>

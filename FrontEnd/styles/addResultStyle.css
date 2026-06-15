@@ -50,16 +50,14 @@
 }
 
 .form-btn:hover { background-color: lightskyblue; }
-.submit-btn { background-color: #a4dbf8; } /* Slight tint so primary action pops */
+.submit-btn { background-color: #a4dbf8; } 
 
-/* BREAKPOINT 1: Tablet */
 @media (min-width: 768px) {
     .set { flex-direction: row; align-items: center; justify-content: space-between; }
     .set h3 { width: 60px; margin: 0; border: none; padding: 0;}
     .set input[type="number"] { width: 70px; }
 }
 
-/* BREAKPOINT 2: Desktop */
 @media (min-width: 1024px) {
     .match-form { padding: 30px; }
     .form-title { font-size: 28px; }

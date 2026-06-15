@@ -56,13 +56,11 @@ requireRole('club_admin');
                 <?php unset($_SESSION['club_error']); ?>
             <?php endif; ?>
 
-            <!-- enctype ΑΠΑΡΑΙΤΗΤΟ για file uploads -->
             <form class="add-club-form"
                   action="../BackEnd/add_club_handler.php"
                   method="POST"
                   enctype="multipart/form-data">
 
-                <!-- General Team Info -->
                 <div class="form-section">
                     <h3>General Information</h3>
                     <div class="form-row">
@@ -91,7 +89,6 @@ requireRole('club_admin');
                     </div>
                 </div>
 
-                <!-- Technical Staff -->
                 <div class="form-section">
                     <h3>Technical Staff</h3>
                     <div class="form-row">
@@ -120,7 +117,6 @@ requireRole('club_admin');
                     </div>
                 </div>
 
-                <!-- Players Roster (12 Players) — αναλλοίωτο -->
                 <div class="form-section">
                     <h3>Players Roster (Minimum 12 Players) *</h3>
                     <div class="table-responsive">
